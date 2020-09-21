@@ -31,9 +31,15 @@
 #
 # Draw geometry:
 /vis/drawVolume
+/vis/set/touchable World 0 lab 0
+/vis/touchable/set/colour 0.0666667 0.811765 0.909804 1
+/vis/set/touchable World 0 lab 0
+/vis/touchable/set/visibility true
+/vis/set/touchable World 0
+/vis/touchable/set/visibility false
 #
 # Specify view angle:
-#/vis/viewer/set/viewpointThetaPhi 90. 0.
+/vis/viewer/set/viewpointThetaPhi 40. 20.
 #
 # Specify zoom value:
 /vis/viewer/zoom 1.4
