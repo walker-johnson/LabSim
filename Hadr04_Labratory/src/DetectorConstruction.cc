@@ -174,9 +174,9 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
 
   //create a box with the outer dimensions of the lab
   G4VSolid* wallS = new G4Box("Wall",
-			   (labX + wallThickness)/2,
-			   (labY + wallThickness)/2,
-			   (labZ+wallThickness)/2);
+			   (labX + 2*wallThickness)/2,
+			   (labY + 2*wallThickness)/2,
+			   (labZ + 2*wallThickness)/2);
 
   //create a box with inner dimensions of the lab
   G4VSolid* interiorS = new G4Box("Interior",
