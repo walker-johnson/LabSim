@@ -57,11 +57,11 @@ DetectorConstruction::DetectorConstruction()
 :G4VUserDetectorConstruction(),
  worldP(0), worldL(0), fMaterial(0), fDetectorMessenger(0)
 {
-  fBoxX = 13.0*m;
-  fBoxY = 12.8*m;
-  fBoxZ = 8.9*m;
+  fBoxX = 13.0*m; //World size X
+  fBoxY = 12.8*m; //World size Y
+  fBoxZ = 8.9*m;  //World size Z
   DefineMaterials();
-  SetMaterial("G4_AIR");  
+  SetMaterial("G4_AIR");   //Sets the material of the world
   fDetectorMessenger = new DetectorMessenger(this);
 }
 
@@ -147,47 +147,61 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   G4PhysicalVolumeStore::GetInstance()->Clean();
   G4LogicalVolumeStore::GetInstance()->Clean();
   G4SolidStore::GetInstance()->Clean();
-  G4bool checkOverlaps = true;
+  G4bool checkOverlaps = true;        //option to check for overlapping geometry
   
   G4Box*
   worldS    = new G4Box("World",                             //its name
-                   fBoxX/2,fBoxY/2,fBoxZ/2);            //its dimensions
+                        fBoxX/2,fBoxY/2,fBoxZ/2);            //its dimensions
 
-  worldL    = new G4LogicalVolume(worldS,                     //its shape
-                             fMaterial,                 //its material
-                             "World");     //its name
+  worldL    = new G4LogicalVolume(worldS,                    //its shape
+                                  fMaterial,                 //its material
+                                  "World");                  //its name
 
   worldP    = new G4PVPlacement(0,                          //no rotation
-                            G4ThreeVector(),            //at (0,0,0)
-                            worldL,                      //its logical volume
-                            "World",       //its name
-                            0,                          //its mother  volume
-                            false,                      //no boolean operation
-			    0,                          //copy number
-			    checkOverlaps);                       
-  G4double labX = 6.8*m;
-  G4double labY = 7*m;
-  G4double labZ = 2.9*m;
-  G4double wallThickness = .33*m;
+                                G4ThreeVector(),            //at (0,0,0)
+                                worldL,                     //its logical volume
+                                "World",                    //its name
+                                0,                          //its mother  volume
+                                false,                      //no boolean operation
+ 			        0,                          //copy number
+				checkOverlaps);             //option to check for overlaps
   
-  G4VSolid* wallS = new G4Box("Wall",
-			   (labX + wallThickness)/2, (labY + wallThickness)/2, (labZ+wallThickness)/2);
-  G4VSolid* interiorS = new G4Box("Interior",
-			       labX/2, labY/2, labZ/2);
+  G4double labX = 6.8*m;     //inner X dimension of the lab
+  G4double labY = 7*m;       //inner Y dimension of the lab
+  G4double labZ = 2.9*m;     //inner Z dimension of the lab
+  G4double wallThickness = .33*m;     //thickness of the lab walls
 
+
+  //create a box with the outer dimensions of the lab
+  G4VSolid* wallS = new G4Box("Wall",
+			   (labX + wallThickness)/2,
+			   (labY + wallThickness)/2,
+			   (labZ+wallThickness)/2);
+
+  //create a box with inner dimensions of the lab
+  G4VSolid* interiorS = new G4Box("Interior",
+			       labX/2,
+			       labY/2,
+			       labZ/2);
+
+  //subtract the inner box from the outter to create a shell in the shape
+  //and size of the lab
   G4VSolid* labS = new  G4SubtractionSolid("labS", wallS, interiorS);
+
+
+  G4Material* labWallMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_CONCRETE");
   
   labL = new G4LogicalVolume(labS,
-			      G4NistManager::Instance()->FindOrBuildMaterial("G4_CONCRETE"),
-			      "lab");
-  labP = new G4PVPlacement(0,
-			    G4ThreeVector(),
-			    labL,
-			    "lab",
-			    worldL,
-			    false,
-			    0,
-			    checkOverlaps);
+			     labWallMaterial,
+			     "lab");
+  labP = new G4PVPlacement(0,                      //no rotation
+			   G4ThreeVector(),        //at (0,0,0)
+			   labL,                   //its logical volume
+			   "lab",                  //its name
+			   worldL,                 //its mother volume
+		           false,                  //no boolean operation
+			   0,                      //copy number
+			   checkOverlaps);         //option to check for overlaps
 
 
 			    
