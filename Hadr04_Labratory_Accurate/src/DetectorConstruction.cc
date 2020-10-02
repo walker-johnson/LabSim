@@ -35,6 +35,7 @@
 #include "DetectorMessenger.hh"
 #include "G4Material.hh"
 #include "G4NistManager.hh"
+#include "PrimaryGeneratorAction.hh"
 
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
@@ -60,6 +61,7 @@ DetectorConstruction::DetectorConstruction()
   fBoxX = 13.0*m; //World size X
   fBoxY = 12.8*m; //World size Y
   fBoxZ = 5.9*m;  //World size Z
+  shieldThickness = .3*m; //thickness of PE shielding
   DefineMaterials();
   SetMaterial("G4_AIR");   //Sets the material of the world
   fDetectorMessenger = new DetectorMessenger(this);
@@ -295,10 +297,10 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
 			      windowMaterial,
 			      "window1");
   win1P = new G4PVPlacement(0,
-			    northWindow1,
+			    northWindow1- G4ThreeVector(0,0, 1.5*m-wallThickness) ,
 			    win1L,
 			    "window1",
-			    labL,
+			    worldL,
 			    false,
 			    0,
 			    checkOverlaps);
@@ -307,10 +309,10 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
 			      windowMaterial,
 			      "window2");
   win2P = new G4PVPlacement(0,
-			    northWindow2,
+			    northWindow2- G4ThreeVector(0,0, 1.5*m-wallThickness) ,
 			    win2L,
 			    "window2",
-			    labL,
+			    worldL,
 			    false,
 			    0,
 			    checkOverlaps);
@@ -319,10 +321,10 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
 			      windowMaterial,
 			      "window3");
   win3P = new G4PVPlacement(0,
-			    northWindow3,
+			    northWindow3- G4ThreeVector(0,0, 1.5*m-wallThickness) ,
 			    win3L,
 			    "window3",
-			    labL,
+			    worldL,
 			    false,
 			    0,
 			    checkOverlaps);
@@ -331,10 +333,10 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
 			      windowMaterial,
 			      "window4");
   win4P = new G4PVPlacement(0,
-			    eastWindow1,
+			    eastWindow1- G4ThreeVector(0,0, 1.5*m-wallThickness) ,
 			    win4L,
 			    "window4",
-			    labL,
+			    worldL,
 			    false,
 			    0,
 			    checkOverlaps);
@@ -343,10 +345,10 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
 			      windowMaterial,
 			      "window5");
   win5P = new G4PVPlacement(0,
-			    eastWindow2,
+			    eastWindow2- G4ThreeVector(0,0, 1.5*m-wallThickness) ,
 			    win5L,
 			    "window5",
-			    labL,
+			    worldL,
 			    false,
 			    0,
 			    checkOverlaps);
@@ -355,23 +357,50 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
 			      doorMaterial,
 			      "door");
   doorP = new G4PVPlacement(0,
-			    doorPos,
+			    doorPos- G4ThreeVector(0,0, 1.5*m-wallThickness) ,
 		            doorL,
 			    "door",
-		            labL,
+		            worldL,
 			    false,
 			    0,
 			    checkOverlaps);
 			    
 			      
   PrintParameters();
+
+  G4Material* shieldMaterial = G4NistManager::Instance()->FindOrBuildMaterial("G4_POLYETHYLENE");
+  PrimaryGeneratorAction src;
+  G4ThreeVector shieldPos = src.sourcePos;
+  G4Box*
+  shieldS = new G4Box("shielding",
+		      shieldThickness, shieldThickness, shieldThickness);
+  shieldL = new G4LogicalVolume(shieldS,
+				shieldMaterial,
+				"shielding");
+  shieldP = new G4PVPlacement(0,
+			      shieldPos,
+			      shieldL,
+			      "shielding",
+			      worldL,
+			      false,
+			      0,
+			      checkOverlaps);
   
+		      
   //always return the root volume
   //
   return worldP;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void DetectorConstruction::SetSheildThickness(G4double thk)
+{
+  shieldThickness = thk;
+  G4RunManager::GetRunManager()->ReinitializeGeometry();
+
+}
+
 
 void DetectorConstruction::PrintParameters()
 {

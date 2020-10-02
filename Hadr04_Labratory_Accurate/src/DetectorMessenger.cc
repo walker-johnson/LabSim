@@ -53,7 +53,15 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction * Det)
   G4bool broadcast = false;
   fDetDir = new G4UIdirectory("/testhadr/det/",broadcast);
   fDetDir->SetGuidance("detector construction commands");
-        
+
+  fSheildCmd = new G4UIcmdWithADoubleAndUnit("/testhadr/det/setSheild",this);
+  fSheildCmd->SetGuidance("Input a sheild thickness");
+  fSheildCmd->SetParameterName("Thickness",false);
+  fSheildCmd->SetRange("Thickness>0");
+  fSheildCmd->SetUnitCategory("Length");
+  fSheildCmd->AvailableForStates(G4State_PreInit,G4State_Idle);
+
+  
   fMaterCmd = new G4UIcmdWithAString("/testhadr/det/setMat",this);
   fMaterCmd->SetGuidance("Select material of the box.");
   fMaterCmd->SetParameterName("choice",false);
@@ -103,6 +111,7 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction * Det)
 DetectorMessenger::~DetectorMessenger()
 {
   delete fMaterCmd;
+  delete fSheildCmd;
   delete fSizeCmd;
   delete fIsotopeCmd;
   delete fDetDir;
@@ -115,7 +124,10 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 { 
   if( command == fMaterCmd )
    { fDetector->SetMaterial(newValue);}
-   
+
+  if( command == fSheildCmd )
+    { fDetector->SetSheildThickness(fSheildCmd->GetNewDoubleValue(newValue)); }
+  
   if( command == fSizeCmd )
     { fDetector->SetSize(fSizeCmd->GetNewDoubleValue(newValue), fSizeCmd->GetNewDoubleValue(newValue), fSizeCmd->GetNewDoubleValue(newValue));}
      

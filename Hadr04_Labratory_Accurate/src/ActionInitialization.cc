@@ -30,6 +30,7 @@
 #include "ActionInitialization.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "RunAction.hh"
+#include "EventAction.hh"
 #include "TrackingAction.hh"
 #include "SteppingAction.hh"
 #include "SteppingVerbose.hh"
@@ -64,11 +65,14 @@ void ActionInitialization::Build() const
     
   RunAction* runAction = new RunAction(fDetector, primary );
   SetUserAction(runAction);
+
+  EventAction* eventAction = new EventAction(runAction);
+  SetUserAction(eventAction);
   
   TrackingAction* trackingAction = new TrackingAction();
   SetUserAction(trackingAction);
   
-  SteppingAction* steppingAction = new SteppingAction(trackingAction);
+  SteppingAction* steppingAction = new SteppingAction(eventAction, trackingAction);
   SetUserAction(steppingAction);
   
   StackingAction* stackingAction = new StackingAction();

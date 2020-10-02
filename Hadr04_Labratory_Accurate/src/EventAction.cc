@@ -23,76 +23,71 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file HistoManager.cc
-/// \brief Implementation of the HistoManager class
+/// \file EventAction.cc
+/// \brief Implementation of the EventAction class
 //
-// 
+// $Id: EventAction.cc 76293 2013-11-08 13:11:23Z gcosmo $
+//
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+#include "EventAction.hh"
+
+#include "Run.hh"
 #include "HistoManager.hh"
+
+#include "G4Event.hh"
+#include "G4RunManager.hh"
+#include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
+#include "G4ParticleGun.hh"
+#include "PrimaryGeneratorAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-HistoManager::HistoManager()
-  : fFileName("Hadr04")
-{
-  Book();
-}
+EventAction::EventAction(RunAction* run)
+  :G4UserEventAction()
+{  
+  fRun = run;            
+} 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-HistoManager::~HistoManager()
-{
-  delete G4AnalysisManager::Instance();
-}
+EventAction::~EventAction()
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void HistoManager::Book()
+void EventAction::BeginOfEventAction(const G4Event*)
 {
-  // Create or get analysis manager
-  // The choice of analysis technology is done via selection of a namespace
-  // in HistoManager.hh
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  analysisManager->SetFileName(fFileName);
-  analysisManager->SetVerboseLevel(1);
-  analysisManager->SetActivation(true);     //enable inactivation of histograms
+  // reset event parameters:
+  neutronEnergy_gen = 0.;
+  neutronEnergy_exitshield = 0.;    
+  neutronEnergy_enterwall = 0.;
+  neutronEnergy_exitlab = 0.;
   
-  // Define histograms start values
-  const G4int kMaxHisto = 8;
-  const G4String id[] = {"0","1","2","3","4","5","6","7"};
-  const G4String title[] = 
-                { "dummy",                                           //0
-                  "Kinetic energy of neutron leaving sheilding",     //1
-                  "KE of neutron entering wall",                     //2
-                  "KE of neutron entering window",                   //3
-                  "KE of  neutron entering door",                    //4
-                  "incident neutron: total track length below 1*eV", //5
-                  "incident neutron: time of flight below 1 eV",     //6
-                  "incident neutron: energy distribution below 1*eV" //7
-                 };  
+  fCount_neutron_exitShield = 0;
+  fCount_neutron_shield2lab = 0;    
+  fCount_neutron_lab2wall = 0;
+  fCount_neutron_lab2window = 0;
+  fCount_neutron_lab2door = 0;
+  fCount_neutron_leaveLab = 0;
+}
 
-  // Default values (to be reset via /analysis/h1/set command)               
-  G4int nbins = 100;
-  G4double vmin = 0.;
-  G4double vmax = 10.;
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-  // Create all histograms as inactivated 
-  // as we have not yet set nbins, vmin, vmax
-  for (G4int k=0; k<kMaxHisto; k++) {
-    G4int ih = analysisManager->CreateH1(id[k], title[k], nbins, vmin, vmax);
-    analysisManager->SetH1Activation(ih, false);
-  }
-
-  // ID=0, neutron transport
-  analysisManager->CreateNtuple("ntransport", "Neutrons crossing boundary"); //id = 0
-  analysisManager->CreateNtupleDColumn("x");
-  analysisManager->CreateNtupleDColumn("y");
-  analysisManager->CreateNtupleDColumn("z");
-  analysisManager->CreateNtupleIColumn("tag"); 
-  analysisManager->FinishNtuple();
+void EventAction::EndOfEventAction(const G4Event* evt)
+{
+//----------------------------------------------------------------- 
+  if(!fRun) return;
+  
+  const PrimaryGeneratorAction* generator
+   = static_cast<const PrimaryGeneratorAction*>
+     (G4RunManager::GetRunManager()->GetUserPrimaryGeneratorAction());
+  const G4ParticleGun* particleGun = generator->GetParticleGun();
+  neutronEnergy_gen = particleGun->GetParticleEnergy();
+  G4AnalysisManager::Instance()->FillH1(0,neutronEnergy_gen);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

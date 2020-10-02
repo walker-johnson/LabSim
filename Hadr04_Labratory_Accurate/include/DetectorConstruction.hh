@@ -58,7 +58,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     MaterialWithSingleIsotope(G4String, G4String, G4double, G4int, G4int);
          
     void SetSize     (G4double, G4double, G4double);              
-    void SetMaterial (G4String);            
+    void SetMaterial (G4String);
+    void SetSheildThickness (G4double);
 
   public:
   
@@ -93,12 +94,16 @@ class DetectorConstruction : public G4VUserDetectorConstruction
      G4VPhysicalVolume* doorP;
      G4LogicalVolume* doorL;
   
+     G4VPhysicalVolume* shieldP;
+     G4LogicalVolume* shieldL;
+
+     G4VPhysicalVolume* worldP;
+     G4LogicalVolume*   worldL;
   
   private:
   
-     G4VPhysicalVolume* worldP;
-     G4LogicalVolume*   worldL;
-     
+
+     G4double           shieldThickness; 
      G4double           fBoxX;
      G4double           fBoxY;
      G4double           fBoxZ;

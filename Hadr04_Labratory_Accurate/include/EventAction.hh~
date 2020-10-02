@@ -23,38 +23,55 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file SteppingAction.hh
-/// \brief Definition of the SteppingAction class
+/// \file EventAction.hh
+/// \brief Definition of the EventAction class
 //
-//
+// 
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef SteppingAction_h
-#define SteppingAction_h 1
+#ifndef EventAction_h
+#define EventAction_h 1
 
-#include "G4UserSteppingAction.hh"
+#include "G4UserEventAction.hh"
 #include "globals.hh"
-#include "DetectorConstruction.hh"
-#include "EventAction.hh"
-#include "TrackingAction.hh"
-
-class TrackingAction;
+#include "RunAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class SteppingAction : public G4UserSteppingAction
+class EventAction : public G4UserEventAction
 {
   public:
-  SteppingAction(EventAction*, TrackingAction*);
-   ~SteppingAction();
+    EventAction(RunAction*);
+   ~EventAction();
 
-    virtual void UserSteppingAction(const G4Step*);
+  public:
+    virtual void BeginOfEventAction(const G4Event*);
+    virtual void EndOfEventAction(const G4Event*);  
     
-  private:
-    EventAction* fEventAction;
-    TrackingAction* fTrackingAction;
-    const DetectorConstruction* fDetector;
+    // boundary crossing counters
+    G4int fCount_neutron_exitShield;
+    G4int fCount_neutron_shield2lab;    
+    G4int fCount_neutron_lab2wall;
+    G4int fCount_neutron_lab2window;
+    G4int fCount_neutron_lab2door;
+    G4int fCount_neutron_leaveLab;
+  
+                
+  private:                  
+  	RunAction* fRun;
+  	
+  	// event variables:
+    G4double neutronEnergy_gen;  // DD neutron energy
+    G4double neutronEnergy_exitshield; // neutrons exiting shield
+    G4double neutronEnergy_enterwall; // neutrons entering lab walls
+    G4double neutronEnergy_exitlab; // neutrons exiting lab walls/windows/door
+    
+    //vector<G4double> gammaEnergy_exitshield; // gammas exiting shield
+    //vector<G4double> gammaEnergy_enterArgon; // gammas entering liquid argon
+    //vector<G4double> gammaEnergy_exitCryostat; // gammas exiting cryostat
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

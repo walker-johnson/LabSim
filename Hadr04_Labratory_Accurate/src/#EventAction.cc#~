@@ -23,40 +23,70 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file SteppingAction.hh
-/// \brief Definition of the SteppingAction class
+/// \file EventAction.cc
+/// \brief Implementation of the EventAction class
 //
+// $Id: EventAction.cc 76293 2013-11-08 13:11:23Z gcosmo $
 //
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef SteppingAction_h
-#define SteppingAction_h 1
-
-#include "G4UserSteppingAction.hh"
-#include "globals.hh"
-#include "DetectorConstruction.hh"
 #include "EventAction.hh"
-#include "TrackingAction.hh"
 
-class TrackingAction;
+#include "Run.hh"
+#include "HistoManager.hh"
+
+#include "G4Event.hh"
+#include "G4RunManager.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
+#include "G4ParticleGun.hh"
+#include "PrimaryGeneratorAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class SteppingAction : public G4UserSteppingAction
+EventAction::EventAction(RunAction* run)
+:G4UserEventAction()
+{  
+  fRun = run;            
+} 
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+EventAction::~EventAction()
+{ }
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void EventAction::BeginOfEventAction(const G4Event*)
 {
-  public:
-  SteppingAction(EventAction*, TrackingAction*);
-   ~SteppingAction();
-
-    virtual void UserSteppingAction(const G4Step*);
-    
-  private:
-    EventAction* fEventAction;
-    TrackingAction* fTrackingAction;
-    const DetectorConstruction* fDetector;
-};
+  // reset event parameters:
+  neutronEnergy_gen = 0.;
+  neutronEnergy_exitshield = 0.;    
+  neutronEnergy_enterArgon = 0.;
+  neutronEnergy_exitCryostat = 0.;
+  
+  fCount_neutron_source2nitrogenBW = 0;
+  fCount_neutron_shield2world = 0;    
+  fCount_neutron_all2argon = 0;
+  fCount_neutron_cryostat2world = 0;
+  fCount_neutron_all2world = 0;
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#endif
+void EventAction::EndOfEventAction(const G4Event* evt)
+{
+//----------------------------------------------------------------- 
+  if(!fRun) return;
+  
+  const PrimaryGeneratorAction* generator
+   = static_cast<const PrimaryGeneratorAction*>
+     (G4RunManager::GetRunManager()->GetUserPrimaryGeneratorAction());
+  const G4ParticleGun* particleGun = generator->GetParticleGun();
+  neutronEnergy_gen = particleGun->GetParticleEnergy();
+  G4AnalysisManager::Instance()->FillH1(0,neutronEnergy_gen);
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

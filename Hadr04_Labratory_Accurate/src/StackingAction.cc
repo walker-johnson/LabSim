@@ -58,9 +58,14 @@ StackingAction::ClassifyNewTrack(const G4Track* aTrack)
   //count secondary particles
   G4String name   = aTrack->GetDefinition()->GetParticleName();
   G4double energy = aTrack->GetKineticEnergy();
+  
   Run* run = static_cast<Run*>(
         G4RunManager::GetRunManager()->GetNonConstCurrentRun());    
   run->ParticleCount(name,energy);
+
+  if(name =="neutron") return fUrgent; //neutrons are tracked first in the urgent stack
+  if(name == "gamma") return fWaiting; //gamma particles will be tracked in the waiting
+                                       //stack, after the neutrons are tracked
 
   //kill all secondaries  
   return fKill;

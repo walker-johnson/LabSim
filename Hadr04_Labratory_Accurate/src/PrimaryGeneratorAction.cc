@@ -56,10 +56,10 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
   G4double labY = 7*m;
   G4double labZ = 2.9*m;
   G4double zOffset = -1.5*m+.33*m;
-  G4double srcHeight = .25*m;  //source distance from the floor
-  G4double srcWidth = .25*m;   //source distance from the walls
+  G4double srcHeight = .5*m;  //source distance from the floor
+  G4double srcWidth = .5*m;   //source distance from the walls
 
-  G4ThreeVector sourcePos = G4ThreeVector(labX/2 - srcWidth, labY/2 - srcWidth, -labZ/2 + srcHeight +zOffset);
+  sourcePos = G4ThreeVector(labX/2 - srcWidth, labY/2 - srcWidth, -labZ/2 + srcHeight +zOffset);
 
   G4ParticleDefinition* particle
            = G4ParticleTable::GetParticleTable()->FindParticle("neutron");

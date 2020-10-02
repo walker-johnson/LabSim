@@ -73,6 +73,16 @@
 # For example, to select colour by particle ID:
 #/vis/modeling/trajectories/create/drawByParticleID
 #/vis/modeling/trajectories/drawByParticleID-0/set e- blue
+/vis/modeling/trajectories/create/drawByParticleID
+/vis/modeling/trajectories/drawByParticleID-0/set geantino green
+/vis/modeling/trajectories/drawByParticleID-0/set e- yellow
+/vis/modeling/trajectories/drawByParticleID-0/set e+ blue
+/vis/modeling/trajectories/drawByParticleID-0/set proton cyan
+/vis/modeling/trajectories/drawByParticleID-0/set gamma red
+/vis/modeling/trajectories/drawByParticleID-0/set anti_nu_e grey
+/vis/modeling/trajectories/drawByParticleID-0/set neutron green
+/vis/modeling/trajectories/drawByParticleID-0/set alpha blue
+
 #
 # To superimpose all of the events from a given run:
 /vis/scene/endOfEventAction accumulate
