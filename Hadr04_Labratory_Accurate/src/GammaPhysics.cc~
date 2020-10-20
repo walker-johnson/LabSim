@@ -23,95 +23,50 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file PhysicsList.cc
-/// \brief Implementation of the PhysicsList class
+/// \file GammaPhysics.cc
+/// \brief Implementation of the GammaPhysics class
+//
+// $Id: GammaPhysics.cc 66587 2012-12-21 11:06:44Z ihrivnac $
 //
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "PhysicsList.hh"
-
-#include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
-
-#include "NeutronHPphysics.hh"
-#include "G4EmStandardPhysics.hh"
-#include "G4DecayPhysics.hh"
-#include "G4RadioactiveDecayPhysics.hh"
-
-#include "G4HadronElasticPhysicsHP.hh"
-#include "G4HadronPhysicsFTFP_BERT_HP.hh"
-#include "G4HadronPhysicsQGSP_BIC_HP.hh"
-#include "G4HadronInelasticQBBC.hh"
-#include "G4HadronPhysicsINCLXX.hh"
-#include "G4IonElasticPhysics.hh"
-#include "G4IonPhysics.hh"
-#include "G4IonINCLXXPhysics.hh"
 #include "GammaPhysics.hh"
 
-// particles
+#include "G4ParticleDefinition.hh"
+#include "G4ProcessManager.hh"
 
-#include "G4BosonConstructor.hh"
-#include "G4LeptonConstructor.hh"
-#include "G4MesonConstructor.hh"
-#include "G4BosonConstructor.hh"
-#include "G4BaryonConstructor.hh"
-#include "G4IonConstructor.hh"
-#include "G4ShortLivedConstructor.hh"
+// Processes
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#include "G4PhotoNuclearProcess.hh"
+#include "G4CascadeInterface.hh"
 
-PhysicsList::PhysicsList()
-:G4VModularPhysicsList()
-{
-  SetVerboseLevel(1);
-  
-  //add new units
-  //
-  new G4UnitDefinition( "millielectronVolt", "meV", "Energy", 1.e-3*eV);   
-  new G4UnitDefinition( "mm2/g",  "mm2/g", "Surface/Mass", mm2/g);
-  new G4UnitDefinition( "um2/mg", "um2/mg","Surface/Mass", um*um/mg);  
-    
-  // Neutron Physics
-  RegisterPhysics( new NeutronHPphysics("neutronHP"));
-
-  //EM physics
-  RegisterPhysics(new G4EmStandardPhysics());
-}
+#include "G4SystemOfUnits.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PhysicsList::~PhysicsList()
+GammaPhysics::GammaPhysics(const G4String& name)
+:  G4VPhysicsConstructor(name)
 { }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PhysicsList::ConstructParticle()
-{
-  G4BosonConstructor  pBosonConstructor;
-  pBosonConstructor.ConstructParticle();
+GammaPhysics::~GammaPhysics()
+{ }
 
-  G4LeptonConstructor pLeptonConstructor;
-  pLeptonConstructor.ConstructParticle();
-
-  G4MesonConstructor pMesonConstructor;
-  pMesonConstructor.ConstructParticle();
-
-  G4BaryonConstructor pBaryonConstructor;
-  pBaryonConstructor.ConstructParticle();
-
-  G4IonConstructor pIonConstructor;
-  pIonConstructor.ConstructParticle();
-
-  G4ShortLivedConstructor pShortLivedConstructor;
-  pShortLivedConstructor.ConstructParticle();  
-}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PhysicsList::SetCuts()
+void GammaPhysics::ConstructProcess()
 {
-  SetCutValue(0*mm, "proton");
-  SetCutValue(1.*mm, "gamma");
+   G4ProcessManager* pManager = G4Gamma::Gamma()->GetProcessManager();
+   //
+   G4PhotoNuclearProcess* process = new G4PhotoNuclearProcess();
+   //
+   G4CascadeInterface* bertini = new G4CascadeInterface();
+   bertini->SetMaxEnergy(10*GeV);
+   process->RegisterMe(bertini);
+   //
+   pManager->AddDiscreteProcess(process);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

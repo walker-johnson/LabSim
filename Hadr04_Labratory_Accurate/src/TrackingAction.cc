@@ -85,12 +85,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* track)
  // histograms
  //
  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
- analysisManager->FillH1(1,fNbStep1);
- analysisManager->FillH1(2,fTrackLen1);
- analysisManager->FillH1(3,fTime1); 
- analysisManager->FillH1(4,fNbStep2);
- analysisManager->FillH1(5,fTrackLen2);
- analysisManager->FillH1(6,fTime2);     
+ 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

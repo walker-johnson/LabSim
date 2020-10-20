@@ -23,73 +23,33 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file EventAction.cc
-/// \brief Implementation of the EventAction class
+/// \file GammaPhysics.hh
+/// \brief Definition of the GammaPhysics class
 //
-// $Id: EventAction.cc 76293 2013-11-08 13:11:23Z gcosmo $
+// $Id: GammaPhysics.hh 66587 2012-12-21 11:06:44Z ihrivnac $
 //
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "EventAction.hh"
+#ifndef GammaPhysics_h
+#define GammaPhysics_h 1
 
-#include "Run.hh"
-#include "HistoManager.hh"
-
-#include "G4Event.hh"
-#include "G4RunManager.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
-#include "G4ParticleGun.hh"
-#include "PrimaryGeneratorAction.hh"
+#include "globals.hh"
+#include "G4VPhysicsConstructor.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-EventAction::EventAction(RunAction* run)
-  :G4UserEventAction()
-{  
-  fRun = run;            
-} 
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-EventAction::~EventAction()
-{ }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void EventAction::BeginOfEventAction(const G4Event*)
+class GammaPhysics : public G4VPhysicsConstructor
 {
-  // reset event parameters:
-  neutronEnergy_gen = 0.;
-  neutronEnergy_exitshield = 0.;    
-  neutronEnergy_enterwall = 0.;
-  neutronEnergy_exitlab = 0.;
-  
-  fCount_neutron_exitShield = 0;
-  fCount_neutron_shield2lab = 0;    
-  fCount_neutron_lab2wall = 0;
-  fCount_neutron_lab2window = 0;
-  fCount_neutron_lab2door = 0;
-  fCount_neutron_leaveLab = 0;
+  public:
+    GammaPhysics(const G4String& name="gamma");
+   ~GammaPhysics();
 
-  fCount_gamma_leaveLab=0;
-}
+  public:
+    virtual void ConstructParticle() { };
+    virtual void ConstructProcess();
+};
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::EndOfEventAction(const G4Event* evt)
-{
-//----------------------------------------------------------------- 
-  if(!fRun) return;
-  
-  const PrimaryGeneratorAction* generator
-   = static_cast<const PrimaryGeneratorAction*>
-     (G4RunManager::GetRunManager()->GetUserPrimaryGeneratorAction());
-  const G4ParticleGun* particleGun = generator->GetParticleGun();
-  neutronEnergy_gen = particleGun->GetParticleEnergy();
-  G4AnalysisManager::Instance()->FillH1(0,neutronEnergy_gen);
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#endif

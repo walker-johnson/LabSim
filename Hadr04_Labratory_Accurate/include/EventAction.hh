@@ -57,6 +57,7 @@ class EventAction : public G4UserEventAction
     G4int fCount_neutron_lab2window;
     G4int fCount_neutron_lab2door;
     G4int fCount_neutron_leaveLab;
+    G4int fCount_gamma_leaveLab;
   
                 
   private:                  

@@ -91,7 +91,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   // Get particle name
   G4String particleName = step->GetTrack()->GetDefinition()->GetParticleName();
 
-  //Neutron passing through boundary
+    //Neutron passing through boundary
   if(particleName == "neutron" && post->GetStepStatus() == fGeomBoundary) {
 
     //neutrons exiting the source sheilding
@@ -141,13 +141,41 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 	 G4AnalysisManager::Instance()->FillNtupleDColumn(0,0,x/1000); //ID, column,value
 	 G4AnalysisManager::Instance()->FillNtupleDColumn(0,1,y/1000); //ID, column,value
 	 G4AnalysisManager::Instance()->FillNtupleDColumn(0,2,z/1000); //ID, column,value
+	 G4AnalysisManager::Instance()->FillNtupleDColumn(0,3,ekin); 
 	 G4AnalysisManager::Instance()->FillNtupleIColumn(0,3,0); //ID, column, tag
 	 G4AnalysisManager::Instance()->AddNtupleRow(0);
 
        }
     } 
   }
-      
+
+  //Gamma passing through boundary
+  if(particleName == "gamma" && post->GetStepStatus() == fGeomBoundary) {
+       
+
+    //gamma leaving the lab
+    if((preLogical == fDetector->labL ||
+	preLogical == fDetector->win1L ||
+	preLogical == fDetector->win2L ||
+	preLogical == fDetector->win3L ||
+	preLogical == fDetector->win4L ||
+	preLogical == fDetector->win5L ||
+	preLogical == fDetector->doorL) &&
+        postLogical == fDetector->worldL){
+      fEventAction->fCount_gamma_leaveLab++;
+      if(fEventAction->fCount_gamma_leaveLab==1){
+	 G4AnalysisManager::Instance()->FillH1(6,ekin);
+	 G4AnalysisManager::Instance()->FillNtupleDColumn(1,0,x/1000); //ID, column,value
+	 G4AnalysisManager::Instance()->FillNtupleDColumn(1,1,y/1000); //ID, column,value
+	 G4AnalysisManager::Instance()->FillNtupleDColumn(1,2,z/1000); //ID, column,value
+	 G4AnalysisManager::Instance()->FillNtupleDColumn(1,3,ekin); 
+	 G4AnalysisManager::Instance()->FillNtupleIColumn(1,3,0); //ID, column, tag
+	 G4AnalysisManager::Instance()->AddNtupleRow(1);
+
+       }
+    } 
+  }
+    
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

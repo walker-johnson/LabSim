@@ -114,7 +114,17 @@ void DetectorConstruction::DefineMaterials()
   G4Material* graphite = 
   new G4Material("graphite", 2.27*g/cm3, ncomponents=1,
                          kStateSolid, 293*kelvin, 1*atmosphere);
-  graphite->AddElement(C, natoms=1);    
+  graphite->AddElement(C, natoms=1);
+
+  // Li-Polyethalene
+  G4double density = 1.06*g/cm3;
+  G4Material* PE =  G4NistManager::Instance()->FindOrBuildMaterial("G4_POLYETHYLENE");
+  G4Isotope* Li7 = new G4Isotope("Lithium-7", 3,4,7.016*g/mole);
+  G4Element* Li = new G4Element("Lithium", "Li",  1);
+  Li->AddIsotope(Li7, 100.*perCent);
+  LiPE = new G4Material("Li-Poly",density,2);
+  LiPE->AddMaterial(PE,92.5*perCent);
+  LiPE->AddElement(Li,7.5*perCent);
   
  ///G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
@@ -375,7 +385,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructVolumes()
   shieldS = new G4Box("shielding",
 		      shieldThickness, shieldThickness, shieldThickness);
   shieldL = new G4LogicalVolume(shieldS,
-				shieldMaterial,
+				LiPE,
 				"shielding");
   shieldP = new G4PVPlacement(0,
 			      shieldPos,

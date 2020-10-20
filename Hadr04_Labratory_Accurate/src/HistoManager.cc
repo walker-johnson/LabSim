@@ -65,12 +65,12 @@ void HistoManager::Book()
   const G4String id[] = {"0","1","2","3","4","5","6","7"};
   const G4String title[] = 
                 { "dummy",                                           //0
-                  "Kinetic energy of neutron leaving sheilding",     //1
+                  "KE of neutron leaving sheilding",                 //1
                   "KE of neutron entering wall",                     //2
                   "KE of neutron entering window",                   //3
                   "KE of  neutron entering door",                    //4
-                  "incident neutron: total track length below 1*eV", //5
-                  "incident neutron: time of flight below 1 eV",     //6
+                  "KE of Neutrons Leaving Lab Boundary",             //5
+                  "KE of Gamma Leaving Lab Boundary",                //6
                   "incident neutron: energy distribution below 1*eV" //7
                  };  
 
@@ -91,6 +91,16 @@ void HistoManager::Book()
   analysisManager->CreateNtupleDColumn("x");
   analysisManager->CreateNtupleDColumn("y");
   analysisManager->CreateNtupleDColumn("z");
+  analysisManager->CreateNtupleDColumn("KE");
+  analysisManager->CreateNtupleIColumn("tag"); 
+  analysisManager->FinishNtuple();
+
+    // ID=1, gamma transport
+  analysisManager->CreateNtuple("gtransport", "Gammas crossing boundary"); //id = 1
+  analysisManager->CreateNtupleDColumn("x");
+  analysisManager->CreateNtupleDColumn("y");
+  analysisManager->CreateNtupleDColumn("z");
+  analysisManager->CreateNtupleDColumn("E");
   analysisManager->CreateNtupleIColumn("tag"); 
   analysisManager->FinishNtuple();
 }

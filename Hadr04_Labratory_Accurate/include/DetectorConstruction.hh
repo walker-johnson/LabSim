@@ -70,6 +70,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction
      G4double           GetSize()       {return fBoxX;};
      void               PrintParameters();
 
+     G4Material* LiPE;
+
      G4VPhysicalVolume* wallP;
      G4LogicalVolume*   wallL;
 
