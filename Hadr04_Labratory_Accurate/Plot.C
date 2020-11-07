@@ -105,8 +105,8 @@ void Plot()
   TCanvas *c2=new TCanvas();
   c2->Divide(3,2);
 
-  Double_t Neutron_D_factor = 420*.01*360*.000001; //B x (divide by 100 sq cm) x (seconds in 1 hr) x (pSv/h ->#muSv/h) 
-  Double_t Gamma_D_factor = 1;
+  Double_t Neutron_D_factor = 420*.01*3600*.000001; //B x (divide by 100 sq cm) x (seconds in 1 hr) x (pSv/h ->#muSv/h) 
+  Double_t Gamma_D_factor = 2.2*.014*.01*3600*.000001;
 
   printf("Total neutrons transported: %d\n", num_trans);
   printf("Total gammas across boundary: %d\n", gnum_trans);
