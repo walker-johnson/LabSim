@@ -49,6 +49,8 @@ set(Hadr04_SCRIPTS
     vis.mac
     analysis.mac
     Plot.C
+    Fullplot.C
+    AnalysisRun.mac
   )
 
 foreach(_script ${Hadr04_SCRIPTS})
