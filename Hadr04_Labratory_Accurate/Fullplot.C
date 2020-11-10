@@ -1,6 +1,9 @@
 #include "TFile.h"
 #include "TTree.h"
 
+//Running this root macro after executing the GEANT4 macro AnalysisRun.mac will produce plots for seven different
+//thicknesses. One plot each for gamma dose rate and neutron dose rate.
+
 void Fullplot()
 {
 
@@ -20,9 +23,10 @@ void Fullplot()
   //open the file
 
 
-  TString files[7] = {"10cmLiPoly.root", "15cmLiPoly.root", "20cmLiPoly.root", "25cmLiPoly.root", "30cmLiPoly.root", "35cmLiPoly.root", "40cmLiPoly.root"};
-  TString titles[7] = {"10cm LiPoly", "15cm LiPoly", "20cm LiPoly", "25cm LiPoly", "30cm LiPoly", "35cm LiPoly", "40cm LiPoly"};
-  for(Int_t i = 0; i<7; i++){
+  TString files[8] = {"noShield.root","10cmLiPoly.root", "15cmLiPoly.root", "20cmLiPoly.root", "25cmLiPoly.root", "30cmLiPoly.root", "35cmLiPoly.root", "40cmLiPoly.root"};
+  TString titles[8] = {" (no shielding)", " (10cm LiPoly)", " (15cm LiPoly)", " (20cm LiPoly)", " (25cm LiPoly)", " (30cm LiPoly)", " (35cm LiPoly)", " (40cm LiPoly)"};
+
+  for(Int_t i = 0; i<8; i++){ //go through each root file and produce plots
       
   TFile* f =  new TFile(files[i]);
 
@@ -107,16 +111,39 @@ void Fullplot()
       
   }
 
-  TCanvas *c1=new TCanvas();
+  TCanvas *c1=new TCanvas("c1"+titles[i], "Neutron Dose Rate"+titles[i], 1500, 1000);
   c1->Divide(3,2);
-  TCanvas *c2=new TCanvas();
+  TCanvas *c2=new TCanvas("c2"+titles[i], "Gamma Dose Rate"+titles[i], 1500, 1000);
   c2->Divide(3,2);
 
-  Double_t Neutron_D_factor = 420*.01*3600*.000001; //B x (divide by 100 sq cm) x (seconds in 1 hr) x (pSv/h ->#muSv/h) 
-  Double_t Gamma_D_factor = 2.2*.014*.01*3600*.000001;
+  Double_t flux = 0.01; // (counts/cm^2)
+  Double_t secPerHr = 3600; // (s/hr)
+  Double_t picoToMilli = .000001; // (milliSv/pSv)
+  Double_t Neutron_D_factor = flux*secPerHr*420*picoToMilli;
+  Double_t Gamma_D_factor = flux*secPerHr*2.2*0.014*1.6*0.0001;
 
-  printf("Total neutrons transported: %d\n", num_trans);
-  printf("Total gammas across boundary: %d\n", gnum_trans);
+  Double_t peakN = xyz->GetMaximum();
+  Double_t peakG = gxyz->GetMaximum();
+
+  printf("Peak Neutron dose rate"+titles[i]+": %f  [miliSv/h]\n",peakN*Neutron_D_factor);
+  printf("Peak Gamma dose rate"+titles[i]+": %f  [miliSv/h]\n",peakG*Gamma_D_factor);
+
+
+  
+  nWall->SetStats(0);
+  ceiling->SetStats(0);
+  eWall->SetStats(0);
+  sWall->SetStats(0);
+  xyz->SetStats(0);
+  wWall->SetStats(0);
+
+  gnWall->SetStats(0);
+  gceiling->SetStats(0);
+  geWall->SetStats(0);
+  gsWall->SetStats(0);
+  gxyz->SetStats(0);
+  gwWall->SetStats(0);
+  
   c1->cd(1);
   nWall->Scale(Neutron_D_factor);
   nWall->Draw("colz");
