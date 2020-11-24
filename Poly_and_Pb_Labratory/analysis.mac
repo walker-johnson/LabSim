@@ -1,0 +1,10 @@
+/analysis/h1/setActivationToAll true
+/analysis/ntuple/setActivationToAll true
+/analysis/h1/setActivationToAll true
+
+/analysis/h1/set 1 100 0 3 MeV
+/analysis/h1/set 2 100 0 3 MeV
+/analysis/h1/set 3 100 0 3 MeV
+/analysis/h1/set 4 100 0 3 MeV
+/analysis/h1/set 5 100 0 3 MeV
+/analysis/h1/set 6 100 0 3 MeV
